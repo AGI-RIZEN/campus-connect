@@ -20,7 +20,8 @@ if (env.NODE_ENV !== 'production') {
  *  500 for what the user experiences as "it randomly doesn't work". */
 function isTransientConnectionError(err: unknown): boolean {
   const message = err instanceof Error ? err.message : String(err);
-  return /server has closed the connection|connection.*(closed|reset|terminated)|ECONNRESET/i.test(message);
+  // "Can't reach database server" = Neon compute still waking from auto-suspend (cold start).
+  return /server has closed the connection|can't reach database server|connection.*(closed|reset|terminated)|ECONNRESET/i.test(message);
 }
 
 export const prisma = basePrisma.$extends({

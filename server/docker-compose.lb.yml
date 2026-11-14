@@ -1,0 +1,79 @@
+# Load-balanced API: nginx in front of N copies of the Express server.
+# Postgres = Neon, Redis = Upstash (from .env), so nothing stateful runs here.
+#
+#   docker compose -f docker-compose.lb.yml up -d --build
+#   docker compose -f docker-compose.lb.yml up -d --scale api=5   # change replica count
+#   docker compose -f docker-compose.lb.yml down
+#
+# Stop `npm run dev` first — nginx publishes on port 4000, same as the dev server,
+# so the app and Tailscale funnel need no config changes.
+
+services:
+  # Local PostgreSQL 18 (runs in Docker — no admin rights needed). Host port 5433 because
+  # the Windows-installed PostgreSQL 18 service already occupies 5432.
+  # Password comes from LOCAL_PG_PASSWORD in .env (compose reads .env for ${...}).
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${LOCAL_PG_PASSWORD}
+      POSTGRES_DB: campus_connect
+    ports:
+      - '5433:5432'
+    volumes:
+      - campus_connect_pg18:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d campus_connect']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  # Local Redis (OTP codes, refresh tokens, Socket.io adapter for multi-replica chat).
+  redis:
+    image: redis:7-alpine
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '6379:6379'
+    volumes:
+      - campus_connect_redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      REDIS_URL: redis://redis:6379
+      # Inside Docker the database is reached by service name, not localhost:5433
+      DATABASE_URL: postgresql://postgres:${LOCAL_PG_PASSWORD}@postgres:5432/campus_connect?schema=public
+      DIRECT_URL: postgresql://postgres:${LOCAL_PG_PASSWORD}@postgres:5432/campus_connect?schema=public
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      replicas: 3
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - '4000:80'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  campus_connect_pg18:
+  campus_connect_redis:
