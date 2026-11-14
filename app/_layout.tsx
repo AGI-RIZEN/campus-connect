@@ -17,6 +17,7 @@ import {
 import { ToastProvider } from '@/components/ui/Toast';
 import { useColorScheme } from 'nativewind';
 import { AuthProvider } from '@/lib/auth-context';
+import { KeyboardProvider } from '@/components/ui/KeyboardSafe';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -67,12 +68,14 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <AuthProvider>
-          <ToastProvider>
-            <StatusBar style="auto" />
-            <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }} />
-          </ToastProvider>
-        </AuthProvider>
+        <KeyboardProvider>
+          <AuthProvider>
+            <ToastProvider>
+              <StatusBar style="auto" />
+              <Stack screenOptions={{ headerShown: false, animation: 'slide_from_right' }} />
+            </ToastProvider>
+          </AuthProvider>
+        </KeyboardProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

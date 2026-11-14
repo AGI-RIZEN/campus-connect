@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Modal, Pressable, TextInput, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView } from '@/components/ui/KeyboardSafe';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Minus, Plus, X } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
@@ -60,10 +61,11 @@ export function PollCreateSheet({ visible, onClose, onSubmit }: Props) {
 
   return (
     <Modal transparent visible={visible} animationType="slide" onRequestClose={handleClose}>
-      <Pressable className="flex-1 bg-black/40" onPress={handleClose} />
+      <KeyboardAvoidingView style={{ flex: 1, justifyContent: 'flex-end' }} behavior="padding">
+      <Pressable style={StyleSheet.absoluteFill} className="bg-black/40" onPress={handleClose} />
       <View
         style={[softShadowLg, { paddingBottom: insets.bottom + 20 }]}
-        className="absolute bottom-0 left-0 right-0 bg-white dark:bg-surface-dark rounded-t-[32px] px-5 pt-5"
+        className="bg-white dark:bg-surface-dark rounded-t-[32px] px-5 pt-5"
       >
         <View className="flex-row items-center justify-between mb-4">
           <View style={{ width: 36 }} />
@@ -118,6 +120,7 @@ export function PollCreateSheet({ visible, onClose, onSubmit }: Props) {
 
         <PrimaryButton label="Create Poll" onPress={handleSubmit} disabled={!canSubmit} className="mt-2" />
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

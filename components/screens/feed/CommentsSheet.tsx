@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, ScrollView, TextInput, View } from 'react-native';
+import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView } from '@/components/ui/KeyboardSafe';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Heart, Send, Smile, X } from 'lucide-react-native';
 import { Avatar } from '@/components/ui/Avatar';
@@ -73,10 +74,11 @@ export function CommentsSheet({ visible, onClose, postId, onCommentPosted }: Pro
 
   return (
     <Modal transparent visible={visible} animationType="slide" onRequestClose={onClose}>
-      <Pressable className="flex-1 bg-black/40" onPress={onClose} />
+      <KeyboardAvoidingView style={{ flex: 1, justifyContent: 'flex-end' }} behavior="padding">
+      <Pressable style={StyleSheet.absoluteFill} className="bg-black/40" onPress={onClose} />
       <View
         style={[softShadowLg, { maxHeight: '78%', paddingBottom: insets.bottom + 12 }]}
-        className="absolute bottom-0 left-0 right-0 bg-white dark:bg-surface-dark rounded-t-[32px]"
+        className="bg-white dark:bg-surface-dark rounded-t-[32px]"
       >
         <View className="flex-row items-center justify-between px-5 pt-5 pb-3">
           <View style={{ width: 36 }} />
@@ -138,6 +140,7 @@ export function CommentsSheet({ visible, onClose, postId, onCommentPosted }: Pro
           </Pressable>
         </View>
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

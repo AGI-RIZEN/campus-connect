@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Modal, Pressable, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView } from '@/components/ui/KeyboardSafe';
 import { H2, Body } from '@/components/ui/Text';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Button';
 import { colors } from '@/lib/theme';
@@ -35,6 +36,7 @@ export function ReasonSheet({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <Pressable className="flex-1 bg-black/40 justify-end" onPress={onClose}>
         <Pressable className="bg-white dark:bg-surface-dark rounded-t-[32px] px-screen pt-6 pb-10">
           <H2>{title}</H2>
@@ -78,6 +80,7 @@ export function ReasonSheet({
           </View>
         </Pressable>
       </Pressable>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
