@@ -9,6 +9,7 @@ import {
 import {
   KeyboardAwareScrollView as RNCKeyboardAwareScrollView,
   KeyboardAvoidingView as RNCKeyboardAvoidingView,
+  KeyboardProvider as RNCKeyboardProvider,
 } from 'react-native-keyboard-controller';
 
 /**
@@ -17,6 +18,14 @@ import {
  * "PromiseResolve called on non-object" on every mount. Swap in RN core's own (behavior-less
  * but crash-free) equivalents on web, and keep the real keyboard-aware behavior on native.
  */
+
+/** Must wrap the whole app on native — without it every keyboard-controller component
+ *  (KeyboardAwareScrollView in <Screen>, the chat KeyboardAvoidingViews) never receives
+ *  keyboard events, so inputs stay hidden behind the keyboard. No-op on web. */
+export function KeyboardProvider({ children }: { children: React.ReactNode }) {
+  if (Platform.OS === 'web') return <>{children}</>;
+  return <RNCKeyboardProvider>{children}</RNCKeyboardProvider>;
+}
 
 type AwareScrollProps = ScrollViewProps & { bottomOffset?: number };
 
