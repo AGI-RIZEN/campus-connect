@@ -18,18 +18,10 @@ export const me = {
   postsCount: 18,
 };
 
-export const courses = [
-  'B.Tech CSE',
-  'B.Tech ECE',
-  'B.Tech Mechanical',
-  'BBA',
-  'BCA',
-  'MCA',
-  'BSc IT',
-  'B.Com',
-];
+export const courses = ['MCA', 'BCA', 'BSc IT'];
 
-export const semesters = [1, 2, 3, 4, 5, 6, 7, 8];
+// BCA / BSc IT run 6 semesters, MCA 4 — so nothing above 6 exists anymore.
+export const semesters = [1, 2, 3, 4, 5, 6];
 
 export type NoticeCategory = 'Urgent' | 'Exam' | 'Event' | 'General';
 
